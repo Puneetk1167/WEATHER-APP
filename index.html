@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nimbus — Live Weather</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!--  ANIMATED BACKGROUND PARTICLES             -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="bg-layer" id="bgLayer"></div>
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!--  LANDING / HERO SEARCH                     -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="landing" id="landing">
+    <div class="landing-inner">
+      <!-- Logo -->
+      <div class="app-logo">
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="26" cy="26" r="26" fill="rgba(52,211,153,0.15)"/>
+          <path d="M26 10C17.163 10 10 17.163 10 26C10 34.837 17.163 42 26 42C34.837 42 42 34.837 42 26C42 17.163 34.837 10 26 10Z" fill="none" stroke="#34D399" stroke-width="1.5"/>
+          <path d="M26 14V26L34 30" stroke="#34D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="26" cy="26" r="3" fill="#34D399"/>
+          <!-- Sun rays -->
+          <path d="M26 6V8M26 44V46M6 26H8M44 26H46M11.636 11.636L13.05 13.05M38.95 38.95L40.364 40.364M38.95 13.05L40.364 11.636M11.636 40.364L13.05 38.95" stroke="#6EE7B7" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-text">Nimbus</span>
+      </div>
+      <p class="app-tagline">Search any city to explore live weather conditions</p>
+
+      <!-- Search Bar -->
+      <div class="search-wrapper landing-search" id="landingSearch">
+        <div class="search-bar">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" id="searchInputLanding" placeholder="Search city or location..." autocomplete="off" />
+          <button class="search-btn" id="searchBtnLanding">
+            <span>Search</span>
+          </button>
+        </div>
+        <!-- Recent Searches -->
+        <div class="recent-chips" id="recentChipsLanding"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!--  DASHBOARD                                 -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="dashboard hidden" id="dashboard">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-logo">
+        <svg width="28" height="28" viewBox="0 0 52 52" fill="none">
+          <circle cx="26" cy="26" r="26" fill="rgba(52,211,153,0.15)"/>
+          <path d="M26 10C17.163 10 10 17.163 10 26C10 34.837 17.163 42 26 42C34.837 42 42 34.837 42 26C42 17.163 34.837 10 26 10Z" fill="none" stroke="#34D399" stroke-width="1.5"/>
+          <path d="M26 14V26L34 30" stroke="#34D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="26" cy="26" r="3" fill="#34D399"/>
+        </svg>
+        <span>Nimbus</span>
+      </div>
+
+      <!-- Dashboard Search -->
+      <div class="search-wrapper dash-search" id="dashSearch">
+        <div class="search-bar">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" id="searchInputDash" placeholder="Search city or location..." autocomplete="off" />
+          <button class="search-btn" id="searchBtnDash">
+            <span>Search</span>
+          </button>
+        </div>
+        <div class="recent-chips" id="recentChipsDash"></div>
+      </div>
+
+      <button class="locate-btn" id="locateBtn" title="Detect my location">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/>
+          <path d="M12 2a10 10 0 1 0 10 10"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="dash-main" id="dashMain">
+
+      <!-- ── HERO WEATHER ── -->
+      <section class="hero-weather glass-card" id="heroWeather">
+        <div class="hero-left">
+          <div class="city-info">
+            <h1 class="city-name" id="cityName">—</h1>
+            <p class="city-date" id="cityDate">—</p>
+            <p class="city-time" id="cityTime">—</p>
+          </div>
+          <div class="temp-display">
+            <span class="temperature" id="temperature">—</span>
+            <span class="temp-unit">°C</span>
+          </div>
+          <p class="weather-desc" id="weatherDesc">—</p>
+        </div>
+        <div class="hero-right">
+          <div class="weather-icon-wrap" id="weatherIconWrap">
+            <img id="weatherIcon" src="" alt="weather" />
+          </div>
+        </div>
+      </section>
+
+      <!-- ── DETAIL CARDS ── -->
+      <section class="details-grid" id="detailsGrid">
+        <!-- Skeleton placeholders replaced by JS -->
+      </section>
+
+      <!-- ── HOURLY FORECAST ── -->
+      <section class="section-block glass-card" id="hourlySection">
+        <h2 class="section-title">Hourly Forecast</h2>
+        <div class="hourly-scroll" id="hourlyScroll"></div>
+      </section>
+
+      <!-- ── 7-DAY FORECAST ── -->
+      <section class="section-block glass-card" id="dailySection">
+        <h2 class="section-title">7-Day Forecast</h2>
+        <div class="daily-list" id="dailyList"></div>
+      </section>
+
+      <!-- ── CHARTS ── -->
+      <section class="charts-grid">
+        <div class="section-block glass-card chart-card">
+          <h2 class="section-title">Temperature · Next 24h</h2>
+          <div class="chart-wrap"><canvas id="tempChart"></canvas></div>
+        </div>
+        <div class="section-block glass-card chart-card">
+          <h2 class="section-title">Humidity · Next 24h</h2>
+          <div class="chart-wrap"><canvas id="humidChart"></canvas></div>
+        </div>
+      </section>
+
+      <!-- ── AIR QUALITY + SUNRISE ── -->
+      <section class="bottom-grid">
+        <div class="section-block glass-card aqi-card" id="aqiCard">
+          <h2 class="section-title">Air Quality</h2>
+          <div class="aqi-inner" id="aqiInner">
+            <div class="aqi-number" id="aqiNumber">—</div>
+            <div class="aqi-label" id="aqiLabel">—</div>
+            <p class="aqi-desc" id="aqiDesc">—</p>
+          </div>
+          <div class="aqi-bar-wrap">
+            <div class="aqi-bar"><div class="aqi-fill" id="aqiFill"></div></div>
+            <div class="aqi-ticks"><span>Good</span><span>Moderate</span><span>Poor</span><span>Hazardous</span></div>
+          </div>
+        </div>
+
+        <div class="section-block glass-card sun-card" id="sunCard">
+          <h2 class="section-title">Sun Schedule</h2>
+          <div class="sun-inner">
+            <div class="sun-item">
+              <div class="sun-icon sunrise-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#FCD34D" stroke-width="1.8" stroke-linecap="round">
+                  <path d="M12 2v4M4.22 4.22l2.83 2.83M2 12h4M20 12h4M17.95 7.05l2.83-2.83M12 6a6 6 0 0 1 6 6M6 12a6 6 0 0 1 6-6"/>
+                  <path d="M3 19h18"/>
+                </svg>
+              </div>
+              <div>
+                <p class="sun-label">Sunrise</p>
+                <p class="sun-time" id="sunriseTime">—</p>
+              </div>
+            </div>
+            <div class="sun-arc-wrap">
+              <svg class="sun-arc" viewBox="0 0 200 110" fill="none">
+                <path d="M10 100 Q100 10 190 100" stroke="rgba(252,211,77,0.3)" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+                <circle class="sun-dot" id="sunDot" cx="10" cy="100" r="7" fill="#FCD34D"/>
+              </svg>
+            </div>
+            <div class="sun-item">
+              <div class="sun-icon sunset-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="1.8" stroke-linecap="round">
+                  <path d="M12 10V2M4.22 4.22l2.83 2.83M2 10H6M18 10h4M17.95 4.22l-2.83 2.83M12 6a6 6 0 0 1 6 6M6 12a6 6 0 0 1 6-6"/>
+                  <path d="M3 19h18M12 16v3"/>
+                </svg>
+              </div>
+              <div>
+                <p class="sun-label">Sunset</p>
+                <p class="sun-time" id="sunsetTime">—</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!--  ERROR CARD (overlay)                      -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="error-overlay hidden" id="errorOverlay">
+    <div class="error-card glass-card">
+      <div class="error-icon">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 8v4M12 16h.01"/>
+        </svg>
+      </div>
+      <h2 class="error-title">City Not Found</h2>
+      <p class="error-msg" id="errorMsg">Please check the spelling and try again.</p>
+      <button class="error-close" id="errorClose">Try Again</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!--  LOADING OVERLAY                           -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="load-overlay hidden" id="loadOverlay">
+    <div class="loader-ring"></div>
+    <p class="loader-text">Fetching weather data…</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
