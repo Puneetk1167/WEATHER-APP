@@ -26,7 +26,7 @@
 // 1 · CONFIGURATION  (replace API_KEY with your OWM key)
 // ─────────────────────────────────────────────────────────────
 const CFG = {
-  API_KEY  : '89bbd051b18bfd0bc42d23f6ef226cc3',
+  API_KEY  : '5ff16e5f5828f1a017dbf7f038c7f947',
   BASE     : 'https://api.openweathermap.org/data/2.5',
   ICON_URL : 'https://openweathermap.org/img/wn/',
   UNITS    : 'metric',
